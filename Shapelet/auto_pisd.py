@@ -10,7 +10,7 @@ def auto_piss_extractor(i, time_series=None, num_pip=0.2, j=0, return_pip=0):
         a = (p2_y - p3_y) / (p2_x - p3_x)
         c = p2_y - p2_x * a
         return abs(b * p1_y + a * p1_x + c) / ((a ** 2 + b ** 2)**0.5)
-    print("extract - %s - %s - %s" %(j, i, num_pip))
+    print("extract - index_in_train_dataset:%s - dim_index:%s - num_pip:%s" %(j, i, num_pip))
     ts = time_series[i]
     max_no_pip = int(num_pip*len(ts))
     if max_no_pip < 5:

@@ -94,6 +94,8 @@ def Data_Verifier(config):
 
     if config['data_path'].split('/')[-2] == 'UEA':
         config['data_path'] = os.path.join(config['data_path'], 'Multivariate_ts')
+    if config['data_path'].split('/')[-2] == 'CQC':
+        config['data_path'] = os.path.join(config['data_path'], 'Multivariate_ts')
 
 
 def Downloader(file_url, problem):
@@ -133,6 +135,28 @@ def Downloader(file_url, problem):
         print(f'Failed to download the {problem} please update the file_url')
     return
 
+class dataset_class_with_dfov(Dataset):
+
+    def __init__(self, data, label):
+        super(dataset_class, self).__init__()
+
+        self.feature = data
+        self.labels = label.astype(np.int32)
+
+    def __getitem__(self, ind):
+
+        x = self.feature[ind]
+        x = x.astype(np.float32)
+
+        y = self.labels[ind]  # (num_labels,) array
+
+        data = torch.tensor(x)
+        label = torch.tensor(y)
+
+        return data, label, ind
+
+    def __len__(self):
+        return len(self.labels)
 
 class dataset_class(Dataset):
 

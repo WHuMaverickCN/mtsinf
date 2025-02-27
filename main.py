@@ -25,7 +25,7 @@ warnings.warn = warn
 logger = logging.getLogger('__main__')
 parser = argparse.ArgumentParser()
 # -------------------------------------------- Input and Output --------------------------------------------------------
-parser.add_argument('--data_path', default='Dataset/UEA/', choices={'Dataset/UEA/', 'Dataset/Segmentation/'},
+parser.add_argument('--data_path', default='Dataset/UEA/', choices={'Dataset/UEA/', 'Dataset/CQC/', 'Dataset/Segmentation/'},
                     help='Data path')
 parser.add_argument('--output_dir', default='Results',
                     help='Root output directory. Must exist. Time-stamped directories will be created inside.')
@@ -79,6 +79,12 @@ parser.add_argument('--gpu', type=int, default='0', help='GPU index, -1 for CPU'
 parser.add_argument('--console', action='store_true', help="Optimize printout for console output; otherwise for file")
 parser.add_argument('--seed', default=1, type=int, help='Seed used for splitting sets')
 
+
+#------------CQC Parameters--------------------------
+parser.add_argument('--cqc_data_name', default='RealMFQC_StageII', help='长安数据集名称')
+
+
+
 args = parser.parse_args()
 
 
@@ -89,10 +95,110 @@ if __name__ == '__main__':
     All_Results = ['Datasets', 'ConvTran']  # Use to store the accuracy of ConvTran in e.g "Result/Datasets/UEA"
     list_dataset_name = os.listdir(config['data_path'])
     list_dataset_name.sort()
+
+    CQC_dataset_name = config['cqc_data_name']
     print(list_dataset_name)
-    for problem in list_dataset_name[config['dataset_pos']:config['dataset_pos']+1]:  # for loop on the all datasets in "data_dir" directory
+    if config['data_path'].split('/')[1] == 'UEA':
+        for problem in list_dataset_name[config['dataset_pos']:config['dataset_pos']+1]:  # for loop on the all datasets in "data_dir" directory
+            config['data_dir'] = config['data_path'] +"/"+ problem
+            print(problem)
+            # ------------------------------------ Load Data ---------------------------------------------------------------
+            logger.info("Loading Data ...")
+            Data = Data_Loader(config)
+            train_data = Data['train_data']
+            train_label = Data['train_label']
+            len_ts = Data['max_len']
+            dim = train_data.shape[1]
+            print("Number of shapelet %s - %s" % (config['num_shapelet'], config['window_size']))
+
+            # --------------------------------------------------------------------------------------------------------------
+            # -------------------------------------------- Shapelet Discovery ----------------------------------------------
+            shapelet_discovery = ShapeletDiscover(window_size=args.window_size, num_pip=args.num_pip,
+                                                processes=args.processes, len_of_ts=len_ts, dim=dim)
+            sc_path = "store/" + problem + "_" + \
+                str(float(args.window_size)) +  ".pkl"
+
+            # str(args.window_size) + \
+            if args.pre_shapelet_discovery == 1:
+                shapelet_discovery.load_shapelet_candidates(path=sc_path)
+            else:
+                time_s = time.time()
+                shapelet_discovery.extract_candidate(train_data=train_data)
+                shapelet_discovery.discovery(train_data=train_data, train_labels=train_label)
+                shapelet_discovery.save_shapelet_candidates(path=sc_path)
+                print("shapelet discovery time: %s" % (time.time() - time_s))
+
+            shapelets_info = shapelet_discovery.get_shapelet_info(number_of_shapelet=args.num_shapelet)
+
+            #
+            sw = torch.tensor(shapelets_info[:,3])
+            sw = torch.softmax(sw*20, dim=0)*sw.shape[0]
+            shapelets_info[:,3] = sw.numpy()
+
+            print(shapelets_info.shape)
+            shapelets = []
+            for si in shapelets_info:
+                sc = train_data[int(si[0]), int(si[5]), int(si[1]):int(si[2])]
+                shapelets.append(sc)
+            config['shapelets_info'] = shapelets_info
+            config['shapelets'] = shapelets
+            config['len_ts'] = len_ts
+            config['ts_dim'] = dim
+
+            train_dataset = dataset_class(Data['All_train_data'], Data['All_train_label'])
+            test_dataset = dataset_class(Data['test_data'], Data['test_label'])
+
+            train_loader = DataLoader(dataset=train_dataset, batch_size=config['batch_size'], shuffle=True, pin_memory=True)
+            test_loader = DataLoader(dataset=test_dataset, batch_size=config['batch_size'], shuffle=True, pin_memory=True)
+
+            # --------------------------------------------------------------------------------------------------------------
+            # -------------------------------------------- Build Model -----------------------------------------------------
+            dic_position_results = [config['data_dir'].split('/')[-1]]
+
+            logger.info("Creating model ...")
+            config['Data_shape'] = Data['train_data'].shape
+            config['num_labels'] = int(max(Data['train_label']))+1
+
+            model = model_factory(config)
+            logger.info("Model:\n{}".format(model))
+            logger.info("Total number of parameters: {}".format(count_parameters(model)))
+            # -------------------------------------------- Model Initialization ------------------------------------
+            optim_class = get_optimizer("RAdam")
+            config['optimizer'] = optim_class(model.parameters(), lr=config['lr'], weight_decay=config['weight_decay'])
+            config['loss_module'] = get_loss_module()
+            save_path = os.path.join(config['save_dir'], problem + 'model_{}.pth'.format('last'))
+            tensorboard_writer = SummaryWriter('summary')
+            model.to(device)
+            # ---------------------------------------------- Training The Model ------------------------------------
+            logger.info('Starting training...')
+            trainer = SupervisedTrainer(model, train_loader, device, config['loss_module'], config['optimizer'], l2_reg=0,
+                                        print_interval=config['print_interval'], console=config['console'], print_conf_mat=False)
+            test_evaluator = SupervisedTrainer(model, test_loader, device, config['loss_module'],
+                                            print_interval=config['print_interval'], console=config['console'],
+                                            print_conf_mat=False)
+
+            train_runner(config, model, trainer, test_evaluator, save_path)
+            best_model, optimizer, start_epoch = load_model(model, save_path, config['optimizer'])
+            best_model.to(device)
+
+            best_test_evaluator = SupervisedTrainer(best_model, test_loader, device, config['loss_module'],
+                                                    print_interval=config['print_interval'], console=config['console'],
+                                                    print_conf_mat=True)
+            best_aggr_metrics_test, all_metrics = best_test_evaluator.evaluate(keep_all=True)
+            print_str = 'Best Model Test Summary: '
+            for k, v in best_aggr_metrics_test.items():
+                print_str += '{}: {} | '.format(k, v)
+            print(print_str)
+            dic_position_results.append(all_metrics['total_accuracy'])
+            problem_df = pd.DataFrame(dic_position_results)
+            problem_df.to_csv(os.path.join(config['pred_dir'] + '/' + problem + '.csv'))
+
+            All_Results = np.vstack((All_Results, dic_position_results))
+    elif config['data_path'].split('/')[1] == 'CQC':
+        # problem = os.listdir(config['data_path'])[-2]
+        problem = CQC_dataset_name
+        print("Problem: %s" % problem)
         config['data_dir'] = config['data_path'] +"/"+ problem
-        print(problem)
         # ------------------------------------ Load Data ---------------------------------------------------------------
         logger.info("Loading Data ...")
         Data = Data_Loader(config)
@@ -106,9 +212,12 @@ if __name__ == '__main__':
         # -------------------------------------------- Shapelet Discovery ----------------------------------------------
         shapelet_discovery = ShapeletDiscover(window_size=args.window_size, num_pip=args.num_pip,
                                               processes=args.processes, len_of_ts=len_ts, dim=dim)
-        sc_path = "store/" + problem + "_" + str(args.window_size) + ".pkl"
+        sc_path = "store/" + problem + "_" + \
+            str(float(args.window_size)) +  ".pkl"
+
+        # str(args.window_size) + \
         if args.pre_shapelet_discovery == 1:
-            shapelet_discovery.load_shapelet_candidates(path=sc_path)
+             shapelet_discovery.load_shapelet_candidates(path=sc_path)
         else:
             time_s = time.time()
             shapelet_discovery.extract_candidate(train_data=train_data)
@@ -185,4 +294,4 @@ if __name__ == '__main__':
 
     All_Results_df = pd.DataFrame(All_Results)
     All_Results_df.to_csv(os.path.join(config['output_dir'], 'ConvTran_Results.csv'))
-    print(problem)
+    # print(problem)

@@ -70,8 +70,8 @@ class ShapeletDiscover():
 
         return list_shapelet
 
-    def find_ppi(self, i, l, d):
-        print("discovery %s - %s - %s" % (i, l, d))
+    def  find_ppi(self, i, l, d):
+        print("discovery index_in_current_label:%s -label_type(0&1): %s - dimension:%s" % (i, l, d))
         list_result = []
         ts_pos = self.group_train_data_pos[l][i]
         pdm = {}
@@ -173,6 +173,7 @@ class ShapeletDiscover():
 
 
     def discovery(self, train_data, train_labels, flag=1):
+        self.window_size = int(self.window_size)
         time2 = time.time()
         self.train_data = train_data
         self.train_labels = train_labels
@@ -186,6 +187,8 @@ class ShapeletDiscover():
             self.list_end_pos[-(i + 1)] -= self.window_size - i
         for i in range(self.window_size - 1):
             self.list_start_pos[i] += self.window_size - i - 1
+
+
 
         # Divide time series into group of label
         self.group_train_data = [[] for i in self.list_labels]
@@ -217,8 +220,12 @@ class ShapeletDiscover():
                     temp_ppi = [self.find_ppi(i, l, d) for i in range(len(self.group_train_data[l]))]
                     list_ppi = []
                     for i in range(len(self.group_train_data[l])):
+                        # 此处对每个标签中对应的 MTS 进行遍历，将前一步计算的关键点（PPI）赋值到变量中
                         pii_in_i = temp_ppi[i]
+                        
                         for j in range(len(pii_in_i)):
+                            #遍历序列中的每一个 PPI 元组
+
                             list_ppi.append(pii_in_i[j])
                     list_ppi = np.asarray(list_ppi)
                     self.list_group_ppi[l].append(list_ppi)

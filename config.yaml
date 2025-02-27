@@ -1,0 +1,9 @@
+paths:
+  test: /home/gyx/projects/shapeformer/Dataset/raw/serinf2jag/allinone/20250220_l35-0809/train_converted_data_full.csv
+  train: /home/gyx/projects/shapeformer/Dataset/raw/serinf2jag/allinone/20250219_l35-0727/train_converted_data_full.csv
+
+sample_sequence_length: 200
+step_length: 8
+start_point: 10
+target_d_precision: 1.0
+test_case_name: /home/gyx/projects/shapeformer/Dataset/CQC/Multivariate_ts/RealMFQC_StageIII_id19_10_010_steplen8

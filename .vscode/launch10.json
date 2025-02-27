@@ -1,0 +1,280 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "shapelet_discovering_0_ArticulatoryWordRecognition",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/cpu_main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=0",
+                "--window_size=50"
+            ]
+        },
+        {
+            "name": "Model_training_0_ArticulatoryWordRecognition",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=0",
+                "--num_shapelet=10",
+                "--window_size=50"
+            ]
+        },
+        {
+            "name": "shapelet_discovering_1_AtrialFibrillation",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/cpu_main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=1",
+                "--window_size=100"
+            ]
+        },
+        {
+            "name": "Model_training_1_AtrialFibrillation",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=1",
+                "--num_shapelet=3",
+                "--window_size=100"
+            ]
+        },
+        {
+            "name": "shapelet_discovering_2_BasicMotions",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/cpu_main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=2",
+                "--window_size=100"
+            ]
+        },
+        {
+            "name": "Model_training_2_BasicMotions",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=2",
+                "--num_shapelet=10",
+                "--window_size=100"
+            ]
+        },
+        {
+            "name": "shapelet_discovering_3_CharacterTrajectories",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/cpu_main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=3",
+                "--window_size=50"
+            ]
+        },
+        {
+            "name": "Model_training_3_CharacterTrajectories",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=3",
+                "--num_shapelet=3",
+                "--window_size=50"
+            ]
+        },
+        {
+            "name": "shapelet_discovering_4_Cricket",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/cpu_main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=4",
+                "--window_size=200"
+            ]
+        },
+        {
+            "name": "Model_training_4_Cricket",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=4",
+                "--num_shapelet=30",
+                "--window_size=200"
+            ]
+        },
+        {
+            "name": "shapelet_discovering_5_DuckDuckGeese",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/cpu_main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=5",
+                "--window_size=10"
+            ]
+        },
+        {
+            "name": "Model_training_5_DuckDuckGeese",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=5",
+                "--num_shapelet=100",
+                "--window_size=10"
+            ]
+        },
+        {
+            "name": "shapelet_discovering_6_ERing",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/cpu_main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=6",
+                "--window_size=50"
+            ]
+        },
+        {
+            "name": "Model_training_6_ERing",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=6",
+                "--num_shapelet=100",
+                "--window_size=50"
+            ]
+        },
+        {
+            "name": "shapelet_discovering_7_EigenWorms",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/cpu_main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=7",
+                "--window_size=50"
+            ]
+        },
+        {
+            "name": "Model_training_7_EigenWorms",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=7",
+                "--num_shapelet=100",
+                "--window_size=50"
+            ]
+        },
+        {
+            "name": "shapelet_discovering_8_Epilepsy",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/cpu_main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=8",
+                "--window_size=20"
+            ]
+        },
+        {
+            "name": "Model_training_8_Epilepsy",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=8",
+                "--num_shapelet=30",
+                "--window_size=20"
+            ]
+        },
+        {
+            "name": "shapelet_discovering_9_EthanolConcentration",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/cpu_main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=9",
+                "--window_size=200"
+            ]
+        },
+        {
+            "name": "Model_training_9_EthanolConcentration",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=9",
+                "--num_shapelet=100",
+                "--window_size=200"
+            ]
+        },
+        {
+            "name": "shapelet_discovering_10_FaceDetection",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/cpu_main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=10",
+                "--window_size=10"
+            ]
+        },
+        {
+            "name": "Model_training_10_FaceDetection",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
+            "args": [
+                "--dataset_pos=10",
+                "--num_shapelet=10",
+                "--window_size=10"
+            ]
+        }
+    ]
+}
