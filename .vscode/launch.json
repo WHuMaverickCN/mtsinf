@@ -2,183 +2,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "id19s",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/cpu_main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--window_size=10",
-                "--cqc_data_name=RealMFQC_StageIII_id19_10_010_steplen8"
-            ]
-        },
-        {
-            "name": "id19t",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--num_shapelet=30",
-                "--window_size=10",
-                "--cqc_data_name=RealMFQC_StageIII_id19_10_010_steplen8",
-                // "--pre_shapelet_discovery=0"
-            ]
-        },
-        {
-            "name": "id16Discovery Shapelets",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/cpu_main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--window_size=10",
-                "--cqc_data_name=RealMFQC_StageIII_id16short"
-            ]
-        },
-        {
-            "name": "id16Train",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--num_shapelet=30",
-                "--window_size=10",
-                "--cqc_data_name=RealMFQC_StageIII_id16short",
-                // "--pre_shapelet_discovery=0"
-            ]
-        },
-        {
-            "name": "id14_Discovery Shapelets",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/cpu_main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--window_size=20",
-                "--cqc_data_name=RealMFQC_StageIII_id14_10_010_steplen1"
-            ]
-        },
-        {
-            "name": "id14Train",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--num_shapelet=30",
-                "--window_size=20",
-                "--cqc_data_name=RealMFQC_StageIII_id14_10_010_steplen1",
-                // "--pre_shapelet_discovery=0"
-            ]
-        },
-        {
-            "name": "id16Train",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--num_shapelet=30",
-                "--window_size=10",
-                "--cqc_data_name=RealMFQC_StageIII_id16short",
-                // "--pre_shapelet_discovery=0"
-            ]
-        },
-        {
-            "name": "id12_Discovery Shapelets",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/cpu_main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--window_size=20",
-                "--cqc_data_name=RealMFQC_StageIII_id12_10_012_steplen20"
-            ]
-        },
-        {
-            "name": "id12Train",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--num_shapelet=30",
-                "--window_size=20",
-                "--cqc_data_name=RealMFQC_StageIII_id12_10_012_steplen20",
-                // "--pre_shapelet_discovery=0"
-            ]
-        },
-        {
-            "name": "id11Train",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--num_shapelet=30",
-                "--window_size=20",
-                "--cqc_data_name=RealMFQC_StageIII_id11_10_010_steplen20",
-                // "--pre_shapelet_discovery=0"
-            ]
-        },
-        {
-            "name": "id11",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/cpu_main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--window_size=20",
-                "--cqc_data_name=RealMFQC_StageIII_id11_10_010_steplen20"
-            ]
-        },
-        {
             "name": "id04_train",
             "type": "debugpy",
             "request": "launch",
@@ -191,26 +14,12 @@
                 "--dataset_pos=8",
                 "--num_shapelet=30",
                 "--window_size=20",
-                "--cqc_data_name=RealMFQC_StageIII_id04_012"
+                "--cqc_data_name=RealMFQC_StageIII_id04_012",
+                "--batch_size=1"
             ]
         },
         {
-            "name": "id01",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/cpu_main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--window_size=20",
-                "--cqc_data_name=RealMFQC_StageII_id01"
-            ]
-        },
-        {
-            "name": "id01_train",
+            "name": "id21_modi_train",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/main.py",
@@ -222,11 +31,13 @@
                 "--dataset_pos=8",
                 "--num_shapelet=30",
                 "--window_size=20",
-                "--cqc_data_name=RealMFQC_StageII_id01"
+                "--cqc_data_name=RealMFQC_StageIII_id20",
+                "--batch_size=8",
+                "--Net_Type=ModiShapeformer"
             ]
         },
         {
-            "name": "Stage2_ShaDis",
+            "name": "id21_modi_shape",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/cpu_main.py",
@@ -237,147 +48,10 @@
                 "--data_path=Dataset/CQC/",
                 "--dataset_pos=8",
                 "--window_size=20",
-                "--cqc_data_name=RealMFQC_StageII"
+                "--cqc_data_name=RealMFQC_StageIII_id21",
+                // "--batch_size=8",
+                // "--Net_Type=ModiShapeformer"
             ]
         },
-        {
-            "name": "Stage2_Train",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--num_shapelet=30",
-                "--window_size=20",
-                "--cqc_data_name=RealMFQC_StageII"
-            ]
-        },
-        {
-            "name": "MFQCreal_shapelet_discovering",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/cpu_main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--window_size=50"
-            ]
-        },
-        {
-            "name": "看一下参数",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/cpu_main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--window_size=50"
-            ]
-        },
-        {
-            "name": "MFQCreal_Model training",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--num_shapelet=30",
-                "--window_size=50",
-                "--cqc_data_name=RealMFQC"
-            ]
-        },
-        {
-            "name": "CQC_shapelet_discovering",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/cpu_main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--window_size=20"
-            ]
-        },
-        {
-            "name": "CQC_Model training",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/main.py",
-            "console": "integratedTerminal",
-            "pythonPath":"/home/gyx/anaconda3/envs/infm38/bin/python",
-            // "justMyCode": false,
-            "args": [
-                "--data_path=Dataset/CQC/",
-                "--dataset_pos=8",
-                "--num_shapelet=30",
-                "--window_size=20"
-            ]
-        },
-        {
-            "name": "shapelet_discovering_8_Epilepsy",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/cpu_main.py",
-            "console": "integratedTerminal",
-            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
-            "args": [
-                "--dataset_pos=8",
-                "--window_size=20"
-            ]
-        },
-        {
-            "name": "Model_training_8_Epilepsy",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/main.py",
-            "console": "integratedTerminal",
-            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
-            "args": [
-                "--dataset_pos=8",
-                "--num_shapelet=30",
-                "--window_size=20"
-            ]
-        },
-        {
-            "name": "DTW",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/comp_dtw.py",
-            "console": "integratedTerminal",
-            "pythonPath": "/home/gyx/anaconda3/bin/python",
-            "args": [
-                // "--dataset_pos=8",
-                // "--num_shapelet=30",
-                // "--window_size=20"
-            ]
-        },
-        {
-            "name": "bench",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "pythonPath": "/home/gyx/anaconda3/envs/infm38/bin/python",
-            "args": [
-                // "--dataset_pos=8",
-                // "--window_size=20"
-            ]
-        }
     ]
 }

@@ -35,7 +35,6 @@ parser.add_argument("--dis_flag", default=1, type=int, help="is extract candidat
 #------------CQC Parameters--------------------------
 parser.add_argument('--cqc_data_name', default='RealMFQC_StageII', help='长安数据集名称')
 
-
 args = parser.parse_args()
 
 if __name__ == '__main__':

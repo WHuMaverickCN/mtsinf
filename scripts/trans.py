@@ -168,7 +168,13 @@ class DataProcessor:
         print(output_path)
         # titles = [f'id','utc',f'posi_type',f'numsv',f'dv',f'fovd',f'speed',f'altitude',f'roll',f'y'] 
         # features_stage1 = ['posi_type','numsv', 'dv', 'fovd', 'speed','altitude','roll']
-        features = ['posi_type', 'dv','altitude','roll'] # stage2 feature selection
+        
+        
+        # features = ['posi_type', 'dv','altitude','roll',f'fovd',\
+        #             f'FOV_distance2',f'FOV_distance3',f'FOV_distance4',f'FOV_distance5'] # stage2 feature selection
+        
+        features = ['posi_type', 'dv','altitude','roll']
+        
         # Create time series features
         window_features = []
         # for feature in features:
@@ -249,7 +255,9 @@ class DataProcessor:
         output_path = self.file_path.replace(".csv", f"_{step_len}_stage3.csv")
         print(output_path)
         
-        features = ['id','posi_type','numsv', 'dv', 'fovd', 'speed','altitude','roll']
+        # features = ['id','posi_type','numsv', 'dv', 'fovd', 'speed','altitude','roll']
+        features = ['id','posi_type','numsv', 'dv', 'fovd', 'speed','altitude','roll',\
+                    f'FOV_distance2',f'FOV_distance3',f'FOV_distance4',f'FOV_distance5']
         
         # Select rows at regular intervals using step_len
         downsampled_df = self.df.iloc[start_point+seq_length-1:num_samples:step_len]

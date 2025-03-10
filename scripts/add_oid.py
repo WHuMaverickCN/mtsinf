@@ -3,11 +3,11 @@ import pandas as pd
 import json
 
 # 指定目录路径
-directory_path = '/home/gyx/projects/shapeformer/Dataset/raw/serinf2jag/allinone/20250219_l17-0619'
+directory_path = '/home/gyx/projects/shapeformer/Dataset/raw/serinf2jag/modisf/20250304_2125_l35_809'
 
 # 定义文件路径
 geojson_path = os.path.join(directory_path, 'train_all_vec.geojson')
-csv_path = os.path.join(directory_path, 'train_converted_data.csv')
+csv_path = os.path.join(directory_path, 'train_converted_data_5D.csv')
 
 # 读取GeoJSON文件
 with open(geojson_path, 'r') as geojson_file:
@@ -16,7 +16,7 @@ with open(geojson_path, 'r') as geojson_file:
 
 id_to_oid = {}
 for feature in geojson_data['features']:
-    # 提取id和oid
+    # 提取id和oid2
     feature_id = feature['properties'].get('id', 'No ID provided')
     feature_oid = feature['properties'].get('oid', 'No OID provided')
     if feature_id and feature_oid:

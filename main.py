@@ -40,7 +40,7 @@ parser.add_argument("--num_shapelet", default=3, type=int, help="number of shape
 parser.add_argument("--window_size", default=100, type=int, help="window size")
 
 # ------------------------------------- Model Parameter and Hyperparameter ---------------------------------------------
-parser.add_argument('--Net_Type', default=['Shapeformer'], choices={'T', 'C-T', 'PPSN', 'Shapeformer'})
+parser.add_argument('--Net_Type', default=['Shapeformer'], choices={'T', 'C-T', 'PPSN', 'Shapeformer','ModiShapeformer'})
 # Local Information
 parser.add_argument("--len_w", default=64, type=float, help="window size")
 parser.add_argument("--local_embed_dim", default=48, type=int, help="embedding dimension of shape")
@@ -79,11 +79,8 @@ parser.add_argument('--gpu', type=int, default='0', help='GPU index, -1 for CPU'
 parser.add_argument('--console', action='store_true', help="Optimize printout for console output; otherwise for file")
 parser.add_argument('--seed', default=1, type=int, help='Seed used for splitting sets')
 
-
 #------------CQC Parameters--------------------------
 parser.add_argument('--cqc_data_name', default='RealMFQC_StageII', help='长安数据集名称')
-
-
 
 args = parser.parse_args()
 

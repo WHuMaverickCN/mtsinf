@@ -8,15 +8,12 @@ from Shapelet.auto_pisd import auto_piss_extractor
 from einops import rearrange, repeat
 from einops.layers.torch import Rearrange
 
-
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
 
 class Permute(nn.Module):
     def forward(self, x):
         return x.permute(1, 0, 2)
-
 
 def model_factory(config):
     if config['Net_Type'][0] == "PPSN":
@@ -26,6 +23,9 @@ def model_factory(config):
         config['shapelets'] = None
     elif config['Net_Type'][0] ==  "Shapeformer":
         model = Shapeformer(config, num_classes=config['num_labels'])
+
+    # elif config['Net_Type'][0] == "ModiShapeFormer":
+    #     model = Shapeformer_modi(config, num_classes=config['num_labels'])
     return model
 
 class DPositionalEncoding(nn.Module):
@@ -220,8 +220,9 @@ class Shapeformer(nn.Module):
         return d_position
 
     def forward(self, x, ep):
-        x_uncentainty = x[:,3,:]
-        x = x[:,:3,:]
+        # 增加一个维度，纳入距离这一个考虑
+        spatial_x = x[:,4:,:]
+        x = x[:,:4,:]
 
         local_x = x.unsqueeze(1)
         local_x = self.embed_layer(local_x)
@@ -265,19 +266,18 @@ class Shapeformer(nn.Module):
         global_out = global_out * self.sw.unsqueeze(0).unsqueeze(2)
         global_out = global_out[:,0,:]
 
-
         # distance mode
-        spatial_x = self.pos_encoder(x)
+
+
+        spatial_x = self.pos_encoder(spatial_x)
         spatial_x = self.transformer_encoder(spatial_x)
         spatial_x = spatial_x.mean(dim=0)
         spatial_x = torch.sigmoid(self.fc(x))
-        
 
         out = torch.cat((global_out,local_out), dim=1)
         out = self.out(out)
         
         return out
-
 
 def position_embedding(position_list):
     max_d = position_list.max() + 1
@@ -285,9 +285,5 @@ def position_embedding(position_list):
     d_position = identity_matrix[position_list.to(dtype=torch.long)]
     return d_position
 
-
 if __name__ == '__main__':
     print()
-
-
-
