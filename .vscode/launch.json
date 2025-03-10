@@ -31,7 +31,7 @@
                 "--dataset_pos=8",
                 "--num_shapelet=30",
                 "--window_size=20",
-                "--cqc_data_name=RealMFQC_StageIII_id20",
+                "--cqc_data_name=RealMFQC_StageIII_id21",
                 "--batch_size=8",
                 "--Net_Type=ModiShapeformer"
             ]

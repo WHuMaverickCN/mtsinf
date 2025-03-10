@@ -314,9 +314,9 @@ class Shapeformer(nn.Module):
         self.shapelet_info = torch.FloatTensor(self.shapelet_info)
         self.position = torch.index_select(self.shapelet_info, 1, torch.tensor([5, 1, 2]))
         # 1hot pos embedding
-        self.d_position = self.position_embedding(self.position[:, 0])
-        self.s_position = self.position_embedding(self.position[:, 1])
-        self.e_position = self.position_embedding(self.position[:, 2])
+        self.d_position = self.position_embedding(self.position[:, 0]) #对于维度的位置编码
+        self.s_position = self.position_embedding(self.position[:, 1]) # 对于起始位置的位置编码
+        self.e_position = self.position_embedding(self.position[:, 2]) # 对于结束位置的位置编码
 
         self.d_pos_embedding = nn.Linear(self.d_position.shape[1], config['pos_embed_dim'])
         self.s_pos_embedding = nn.Linear(self.s_position.shape[1], config['pos_embed_dim'])
