@@ -1,5 +1,5 @@
 # Ignore Dataset/UEA directory and its contents
-Dataset/UEA/
+Dataset/
 # Dataset/CQC/
 Results/
 summary/
