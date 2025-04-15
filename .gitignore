@@ -16,4 +16,4 @@ __pycache__/
 *.pyc
 
 *.jar
-*.tar
+*.taroutput_filename.tar
