@@ -24,7 +24,7 @@ def convert_dataframe_to_series_list(df):
 # from dtwd import convert_dataframe_to_series_list
 
 
-X_train,y_train = load_from_tsfile_to_dataframe('/home/gyx/projects/shapeformer/Dataset/CQC/Multivariate_ts/RealMFQC/RealMFQC_TRAIN.ts')
+X_train,y_train = load_from_tsfile_to_dataframe('/home/gyx/projects/shapeformer/Dataset/CQC/Multivariate_ts/RealMFQC_StageIII_id31/RealMFQC_StageIII_id31_TRAIN.ts')
 series_list = convert_dataframe_to_series_list(X_train)
 print(type(series_list))
 print(series_list[0].__len__())

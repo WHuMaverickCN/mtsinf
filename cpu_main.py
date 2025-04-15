@@ -34,6 +34,9 @@ parser.add_argument("--is_extract_candidate", default=1, type=int, help="is extr
 parser.add_argument("--dis_flag", default=1, type=int, help="is extract candidate?")
 #------------CQC Parameters--------------------------
 parser.add_argument('--cqc_data_name', default='RealMFQC_StageII', help='长安数据集名称')
+parser.add_argument("--seq_len", default=100, type=float, help="window size")
+
+
 
 args = parser.parse_args()
 

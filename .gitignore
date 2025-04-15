@@ -1,6 +1,18 @@
 # Ignore Dataset/UEA directory and its contents
-Dataset/
+/Dataset/
 # Dataset/CQC/
-Results/
-summary/
-store/
+/Results/
+/summary/
+/store/
+
+/runs
+
+/.vscode
+/.idea
+/..bfg-report
+
+__pycache__/
+*.py[cod]
+*.pyc
+
+*.jar

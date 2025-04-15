@@ -481,3 +481,57 @@ class Analyzer(object):
         return {"total_accuracy": self.total_accuracy, "precision": self.precision, "recall": self.recall,
                 "f1": self.f1, "support": self.support, "prec_avg": self.prec_avg, "rec_avg": self.rec_avg,
                 "ConfMatrix": ConfMatrix}
+
+
+    def analyze_classification_enhanced(self, y_pred, y_true, class_names, excluded_classes=None):
+        """
+        Enhanced analysis function that includes sensitivity for negative samples.
+        """
+        # Basic setup and existing code
+        in_pred_labels = set(list(y_pred))
+        in_true_labels = set(list(y_true))
+        self.existing_class_ind = sorted(list(in_pred_labels | in_true_labels))
+        class_strings = [str(name) for name in class_names]
+        self.existing_class_names = [class_strings[ind][:min(self.maxcharlength, len(class_strings[ind]))] for ind in self.existing_class_ind]
+
+        # Confusion matrix
+        ConfMatrix = metrics.confusion_matrix(y_true, y_pred)
+
+        # Display confusion matrices
+        # if self.print_conf_mat:
+        #     print_confusion_matrix(ConfMatrix, label_strings=self.existing_class_names, title='Confusion matrix')
+        #     print('\n')
+
+        # General metrics
+        self.total_accuracy = np.trace(ConfMatrix) / len(y_true)
+        self.precision, self.recall, self.f1, self.support = metrics.precision_recall_fscore_support(y_true, y_pred, labels=self.existing_class_ind)
+
+        # Print classification report
+        # if self.print_conf_mat:
+        #     print(self.generate_classification_report())
+
+        # Calculate average metrics excluding specified classes
+        self.prec_avg, self.rec_avg = self.get_avg_prec_recall(ConfMatrix, self.existing_class_names, excluded_classes)
+        if excluded_classes:
+            print("\nAverage precision and recall excluding certain classes are calculated.")
+
+        # Calculate and analyze negative sample metrics
+        if 0 in self.existing_class_ind:  # Assuming class '0' is the negative class
+            negative_class_index = self.existing_class_ind.index(0)
+            TN = ConfMatrix[negative_class_index, negative_class_index]
+            FP = ConfMatrix[:, negative_class_index].sum() - TN
+            FN = ConfMatrix[negative_class_index, :].sum() - TN
+            TP = ConfMatrix.sum() - (TN + FP + FN)
+            specificity = TN / (TN + FP) if (TN + FP) > 0 else 0
+            neg_recall = TN / (TN + FN) if (TN + FN) > 0 else 0
+            print(f"Specificity (True Negative Rate) for class '0': {specificity:.2f}")
+            print(f"Negative Recall for class '0': {neg_recall:.2f}")
+
+        # Optionally, add histograms or additional visualizations for precision and recall of negative samples
+        # Additional code for visualization or other metrics could be added here
+
+        return {
+            "total_accuracy": self.total_accuracy, "precision": self.precision, "recall": self.recall,
+            "f1": self.f1, "support": self.support, "prec_avg": self.prec_avg, "rec_avg": self.rec_avg,
+            "ConfMatrix": ConfMatrix, "specificity": specificity, "neg_recall": neg_recall
+        }

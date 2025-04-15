@@ -1,0 +1,1 @@
+/home/gyx/anaconda3/envs/infm38/bin/python /home/gyx/projects/shapeformer/main.py --data_path=Dataset/CQC/ --dataset_pos=8 --num_shapelet=30 --window_size=20 --cqc_data_name=RealMFQC_StageIII_id45pt --batch_size=8 --Net_Type=ModiShapeformer --seq_len=100 --epochs=600

@@ -11,7 +11,7 @@ from torch.utils.tensorboard import SummaryWriter
 from utils import Setup, Initialization, Data_Loader, dataset_class, Data_Verifier
 from Models.shapeformer import model_factory, count_parameters
 from Models.optimizers import get_optimizer
-from Models.loss import get_loss_module
+from Models.loss import get_loss_module,get_loss_module_modi
 from Models.utils import load_model
 from Training import SupervisedTrainer, train_runner
 from Shapelet.mul_shapelet_discovery import ShapeletDiscover
@@ -81,6 +81,12 @@ parser.add_argument('--seed', default=1, type=int, help='Seed used for splitting
 
 #------------CQC Parameters--------------------------
 parser.add_argument('--cqc_data_name', default='RealMFQC_StageII', help='长安数据集名称')
+parser.add_argument('--if_ablation', type=bool, help='Flag for ablation study')
+parser.add_argument('--ablation_mode', help='Mode for ablation study')
+parser.add_argument('--loss_type', choices={'FocalLoss', 'CrossEntropy'}, default='CrossEntropy', help='Type of loss function')
+parser.add_argument("--seq_len", default=100, type=float, help="window size")
+
+
 
 args = parser.parse_args()
 
@@ -141,6 +147,9 @@ if __name__ == '__main__':
             config['shapelets'] = shapelets
             config['len_ts'] = len_ts
             config['ts_dim'] = dim
+
+            config['if_abaltion'] = True
+            config['ablation_mode'] = 'None'
 
             train_dataset = dataset_class(Data['All_train_data'], Data['All_train_label'])
             test_dataset = dataset_class(Data['test_data'], Data['test_label'])
@@ -253,13 +262,19 @@ if __name__ == '__main__':
         config['Data_shape'] = Data['train_data'].shape
         config['num_labels'] = int(max(Data['train_label']))+1
 
+        config['Modi_num_channels'] = 4
+        config['distance_embed_dim'] = 32
+
         model = model_factory(config)
         logger.info("Model:\n{}".format(model))
         logger.info("Total number of parameters: {}".format(count_parameters(model)))
         # -------------------------------------------- Model Initialization ------------------------------------
         optim_class = get_optimizer("RAdam")
         config['optimizer'] = optim_class(model.parameters(), lr=config['lr'], weight_decay=config['weight_decay'])
-        config['loss_module'] = get_loss_module()
+        if config['loss_type'] == 'FocalLoss':
+            config['loss_module'] = get_loss_module_modi()
+        else:
+            config['loss_module'] = get_loss_module()
         save_path = os.path.join(config['save_dir'], problem + 'model_{}.pth'.format('last'))
         tensorboard_writer = SummaryWriter('summary')
         model.to(device)

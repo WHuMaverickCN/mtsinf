@@ -120,7 +120,8 @@ class ModiShapeformer(nn.Module):
         list_ep = position_embedding(torch.tensor(list_p))
         self.local_pos_embedding = torch.cat((list_ed, list_ep), dim=1)
 
-        channel_size, seq_len = config['Data_shape'][1], config['Data_shape'][2]
+        # channel_size, seq_len = config['Data_shape'][1], config['Data_shape'][2]
+        channel_size, seq_len = config['Modi_num_channels'], config['Data_shape'][2]
         dim_ff = config['dim_ff']
         num_heads = config['num_heads']
         local_pos_dim = config['local_pos_dim']
@@ -171,7 +172,8 @@ class ModiShapeformer(nn.Module):
 
         # Parameters Initialization -----------------------------------------------
         emb_size = config['shape_embed_dim']
-
+        dist_emb_size = config['distance_embed_dim']
+        
         self.LayerNorm1 = nn.LayerNorm(emb_size, eps=1e-5)
         self.LayerNorm2 = nn.LayerNorm(emb_size, eps=1e-5)
         self.attention_layer = Attention(emb_size, num_heads, config['dropout'])
@@ -185,12 +187,49 @@ class ModiShapeformer(nn.Module):
 
         self.gap = nn.AdaptiveAvgPool1d(1)
         self.flatten = nn.Flatten()
-        self.out = nn.Linear(emb_size + local_emb_size, num_classes)
-        self.out2 = nn.Linear(emb_size, num_classes)
 
         # Merge Layer----------------------------------------------------------
         self.local_merge = nn.Linear(local_emb_size, int(local_emb_size / 2))
 
+        # Modi modules
+        self.additional_feature_dim = 32  # Embedding dimension for additional features
+        self.if_ablation = config['if_ablation']
+        self.ablation_mode = config['ablation_mode']
+
+        if self.if_ablation!=None:
+            if self.ablation_mode == 'BC':
+                # 形状发现模块 + 距离编码
+                self.out = nn.Linear(emb_size  + dist_emb_size, num_classes)
+            elif self.ablation_mode == 'AC':
+                # 统计编码 + 距离编码
+                self.out = nn.Linear(local_emb_size + dist_emb_size, num_classes)
+            elif self.ablation_mode == 'Bonly':
+                # 仅 形状发现模块
+                self.out = nn.Linear(emb_size, num_classes)
+            elif self.ablation_mode == 'Conly':
+                # 仅 距离发现模块
+                self.out = nn.Linear(dist_emb_size, num_classes)
+            elif self.ablation_mode == 'Aonly':
+                self.out = nn.Linear(local_emb_size, num_classes)
+            elif self.ablation_mode == 'ABC':
+                self.out = nn.Linear(emb_size + local_emb_size + dist_emb_size, num_classes)
+            elif self.ablation_mode == 'AB':
+                self.out = nn.Linear(emb_size + local_emb_size, num_classes)
+        else:
+            self.out = nn.Linear(local_emb_size + dist_emb_size+emb_size, num_classes)
+        self.out2 = nn.Linear(emb_size, num_classes)
+        # self.additional_feature_dim = config['Modi_num_channels'], config['Data_shape'][1]  # Embedding dimension for additional features
+        self.additional_transformer = nn.ModuleList([
+            nn.Linear(5, self.additional_feature_dim),
+            nn.LayerNorm(self.additional_feature_dim),
+            nn.MultiheadAttention(self.additional_feature_dim, num_heads=4, batch_first=True),
+            nn.Linear(self.additional_feature_dim, self.additional_feature_dim),
+            nn.ReLU(),
+            nn.LayerNorm(self.additional_feature_dim)
+        ])
+        # Add mean pooling layer to reduce temporal dimension
+        self.temporal_pooling = nn.AdaptiveAvgPool1d(1)
+        
     def position_embedding(self, position_list):
         max_d = position_list.max() + 1
         identity_matrix = torch.eye(int(max_d))
@@ -198,53 +237,84 @@ class ModiShapeformer(nn.Module):
         return d_position
 
     def forward(self, x, ep):
-        local_x = x.unsqueeze(1)
-        local_x = self.embed_layer(local_x)
-        local_x = self.embed_layer2(local_x).squeeze(2)
-        local_x = local_x.permute(0, 2, 1)
-        x_src_pos = self.Fix_Position(local_x)
-        local_att = local_x + self.local_attention_layer(x_src_pos)
-        local_att = self.local_ln1(local_att)
-        local_out = local_att + self.local_ff(local_att)
-        local_out = self.local_ln2(local_out)
-        local_out = local_out.permute(0, 2, 1)
-        local_out = self.local_gap(local_out)
-        local_out = self.local_flatten(local_out)
+        # Modi modules
+        obs_distance_x = x[:,4:,:]
+        if self.ablation_mode == None or 'C'in self.ablation_mode:
+            obs_distance_x = self.temporal_pooling(obs_distance_x)
+            # obs_distance_x = obs_distance_x.unsqueeze(1)  # Add sequence length dimension
+            obs_distance_x = obs_distance_x.permute(0, 2, 1)  # Change the dimension to (batch, seq_len, feature)
+            for layer in self.additional_transformer:
+                if isinstance(layer, nn.MultiheadAttention):
+                    obs_distance_x, _ = layer(obs_distance_x, obs_distance_x, obs_distance_x)
+                else:
+                    obs_distance_x = layer(obs_distance_x)
 
+            obs_distance_x = obs_distance_x.permute(0, 2, 1)
+            obs_dist_out = self.local_flatten(obs_distance_x)
+        x = x[:,:4,:]
+        if self.ablation_mode == None or 'A'in self.ablation_mode:
+            local_x = x.unsqueeze(1)
+            local_x = self.embed_layer(local_x)
+            local_x = self.embed_layer2(local_x).squeeze(2)
+            local_x = local_x.permute(0, 2, 1)
+            x_src_pos = self.Fix_Position(local_x)
+            local_att = local_x + self.local_attention_layer(x_src_pos)
+            local_att = self.local_ln1(local_att)
+            local_out = local_att + self.local_ff(local_att)
+            local_out = self.local_ln2(local_out)
+            local_out = local_out.permute(0, 2, 1)
+            local_out = self.local_gap(local_out)
+            local_out = self.local_flatten(local_out)
+
+        if self.ablation_mode == None or 'B'in self.ablation_mode:
         # Global information
-        global_x = None
-        for block in self.shape_blocks:
-            if global_x is None:
-                global_x = block(x)
-            else:
-                global_x = torch.cat((global_x, block(x)), dim=1)
-        if self.d_position.device != x.device:
-            self.d_position = self.d_position.to(x.device)
-            self.s_position = self.s_position.to(x.device)
-            self.e_position = self.e_position.to(x.device)
+            global_x = None
+            for block in self.shape_blocks:
+                if global_x is None:
+                    global_x = block(x)
+                else:
+                    global_x = torch.cat((global_x, block(x)), dim=1)
+            if self.d_position.device != x.device:
+                self.d_position = self.d_position.to(x.device)
+                self.s_position = self.s_position.to(x.device)
+                self.e_position = self.e_position.to(x.device)
 
-        d_pos = self.d_position.repeat(x.shape[0], 1, 1)
-        s_pos = self.s_position.repeat(x.shape[0], 1, 1)
-        e_pos = self.e_position.repeat(x.shape[0], 1, 1)
+            d_pos = self.d_position.repeat(x.shape[0], 1, 1)
+            s_pos = self.s_position.repeat(x.shape[0], 1, 1)
+            e_pos = self.e_position.repeat(x.shape[0], 1, 1)
 
-        d_pos_emb = self.d_pos_embedding(d_pos)
-        s_pos_emb = self.s_pos_embedding(s_pos)
-        e_pos_emb = self.e_pos_embedding(e_pos)
+            d_pos_emb = self.d_pos_embedding(d_pos)
+            s_pos_emb = self.s_pos_embedding(s_pos)
+            e_pos_emb = self.e_pos_embedding(e_pos)
 
-        global_x = global_x + d_pos_emb + s_pos_emb + e_pos_emb
-        global_att = global_x + self.attention_layer(global_x)
-        global_att = global_att * self.sw.unsqueeze(0).unsqueeze(2)
-        global_att = self.LayerNorm1(global_att) # Choosing LN and BN
-        global_out = global_att + self.FeedForward(global_att)
-        global_out = self.LayerNorm2(global_out) # Choosing LN and BN
-        global_out = global_out * self.sw.unsqueeze(0).unsqueeze(2)
-        global_out = global_out[:,0,:]
-
-        out = torch.cat((global_out,local_out), dim=1)
+            global_x = global_x + d_pos_emb + s_pos_emb + e_pos_emb
+            global_att = global_x + self.attention_layer(global_x)
+            global_att = global_att * self.sw.unsqueeze(0).unsqueeze(2)
+            global_att = self.LayerNorm1(global_att) # Choosing LN and BN
+            global_out = global_att + self.FeedForward(global_att)
+            global_out = self.LayerNorm2(global_out) # Choosing LN and BN
+            global_out = global_out * self.sw.unsqueeze(0).unsqueeze(2)
+            global_out = global_out[:,0,:]
+        if self.ablation_mode!=None and  self.if_ablation!=None:
+            if self.ablation_mode == 'BC':
+                out = torch.cat((global_out,obs_dist_out), dim=1)
+            elif self.ablation_mode == 'AC':
+                out = torch.cat((local_out,obs_dist_out), dim=1)
+            elif self.ablation_mode == 'Bonly':
+                out = global_out
+            elif self.ablation_mode == 'Conly':
+                out = obs_dist_out
+            elif self.ablation_mode == 'Aonly':
+                out = local_out
+            elif self.ablation_mode == 'AB':
+                out = torch.cat((global_out,local_out), dim=1)
+        else:
+            # 默认情况Shapeformer+Modi
+            out = torch.cat((global_out,local_out,obs_dist_out), dim=1)
         out = self.out(out)
 
         return out
-    
+
 class Shapeformer(nn.Module):
     def __init__(self, config, num_classes):
         super().__init__()

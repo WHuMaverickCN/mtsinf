@@ -9,7 +9,7 @@ from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from Models.loss import l2_reg_loss
+from Models.loss import l2_reg_loss,FocalLoss
 from Models import utils, analysis
 import warnings
 
@@ -67,6 +67,9 @@ class SupervisedTrainer(BaseTrainer):
         if isinstance(args[3], torch.nn.CrossEntropyLoss):
             # self.classification = True  # True if classification, False if regression
             self.analyzer = analysis.Analyzer(print_conf_mat=False)
+        elif isinstance(args[3], FocalLoss):
+            # self.classification = True
+            self.analyzer = analysis.Analyzer(print_conf_mat=False)
         else:
             self.classification = False
         if kwargs['print_conf_mat']:
@@ -78,7 +81,7 @@ class SupervisedTrainer(BaseTrainer):
 
         epoch_loss = 0  # total loss of epoch
         total_samples = 0  # total samples in epoch
-
+        writer = SummaryWriter()
         for i, batch in enumerate(self.dataloader):
 
             X, targets, IDs = batch
@@ -160,7 +163,7 @@ class SupervisedTrainer(BaseTrainer):
         epoch_loss = epoch_loss / total_samples  # average loss per element for whole epoch
         self.epoch_metrics['epoch'] = epoch_num
         self.epoch_metrics['loss'] = epoch_loss
-
+ 
         predictions = torch.from_numpy(np.concatenate(per_batch['predictions'], axis=0))
         probs = torch.nn.functional.softmax(predictions,dim=1)  # (total_samples, num_classes) est. prob. for each class and sample
         predictions = torch.argmax(probs, dim=1).cpu().numpy()  # (total_samples,) int class index for each sample
@@ -168,10 +171,13 @@ class SupervisedTrainer(BaseTrainer):
         targets = np.concatenate(per_batch['targets'], axis=0).flatten()
         class_names = np.arange(probs.shape[1])  # TODO: temporary until I decide how to pass class names
         metrics_dict = self.analyzer.analyze_classification(predictions, targets, class_names)
+        metrics_dict_enhance = self.analyzer.analyze_classification_enhanced(predictions, targets, class_names)
+
 
         self.epoch_metrics['accuracy'] = metrics_dict['total_accuracy']  # same as average recall over all classes
         self.epoch_metrics['precision'] = metrics_dict['prec_avg']  # average precision over all classes
-
+        self.epoch_metrics['specificity'] = metrics_dict_enhance['specificity']  # average recall over all classes
+        
         '''
         if self.model.num_classes == 2:
             false_pos_rate, true_pos_rate, _ = sklearn.metrics.roc_curve(targets, probs[:, 1])  # 1D scores needed
@@ -215,12 +221,13 @@ def validate(val_evaluator, tensorboard_writer, config, best_metrics, best_value
     else:
         condition = (aggr_metrics[config['key_metric']] > best_value)
     if condition:
+        # 是否更新
         best_value = aggr_metrics[config['key_metric']]
         utils.save_model(os.path.join(config['save_dir'], 'model_best.pth'), epoch, val_evaluator.model)
         best_metrics = aggr_metrics.copy()
 
-        #pred_filepath = os.path.join(config['pred_dir'], 'best_predictions')
-        # np.savez(pred_filepath, **per_batch)
+        pred_filepath = os.path.join(config['pred_dir'], 'best_predictions')
+        np.savez(pred_filepath, **per_batch)
 
     return aggr_metrics, best_metrics, best_value
 

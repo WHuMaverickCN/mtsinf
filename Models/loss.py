@@ -3,6 +3,34 @@ import torch.nn as nn
 from torch.nn import functional as F
 
 
+class FocalLoss(nn.Module):
+    def __init__(self, gamma=2, alpha=None, reduction='none'):
+        super(FocalLoss, self).__init__()
+        self.gamma = gamma
+        self.alpha = alpha
+        self.reduction = reduction
+
+    def forward(self, inputs, targets):
+        
+        BCE_loss = F.cross_entropy(inputs, targets.long(), reduction='none')
+        pt = torch.exp(-BCE_loss)
+        F_loss = (1 - pt) ** self.gamma * BCE_loss
+
+        if self.alpha is not None:
+            alpha_t = self.alpha.to(targets.device).gather(0, targets.long())
+            F_loss = alpha_t * F_loss
+
+        if self.reduction == 'mean':
+            return F_loss.mean()
+        elif self.reduction == 'sum':
+            return F_loss.sum()
+        else:
+            return F_loss
+
+
+def get_loss_module_modi():
+    return FocalLoss(gamma=3, alpha=torch.tensor([2, 1]), reduction='none')  # outputs loss for each batch sample
+
 def get_loss_module():
     return NoFussCrossEntropyLoss(reduction='none')  # outputs loss for each batch sample
 

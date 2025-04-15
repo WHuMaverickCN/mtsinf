@@ -55,6 +55,7 @@ def compute_distance_matrix(X):
     n = len(X)
     distance_matrix = np.zeros((n, n))
     for i in range(n):
+        print(f"{i}/{n}")
         for j in range(i, n):
             distance = dtw_ndim.distance(X[i], X[j])
             distance_matrix[i, j] = distance_matrix[j, i] = distance

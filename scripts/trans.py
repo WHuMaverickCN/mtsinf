@@ -5,6 +5,7 @@ import numpy as np
 import yaml
 import shutil
 
+
 class DataProcessor:
     def __init__(self, file_path):
         self.file_path = file_path
@@ -183,7 +184,24 @@ class DataProcessor:
         
         # Add class attribute
         # window_features.append("@attribute af {0,1}")
-        
+        a,_ = os.path.split(self.file_path)
+        _,filename = os.path.split(a)
+        if 'l35_809' in filename:
+            print('l35_809')
+            SPLIT_PLACE = {0:(0,13951),\
+                           1:(13952,26049),\
+                           2:(26050,len(self.df))} # 最后一行的dataframe id
+        elif 'l35_727' in filename:
+            print('l35_727')
+            SPLIT_PLACE = {0:(0,26800),\
+                           1:(26801,58420),\
+                           2:(58421,len(self.df))} # 最后一行的dataframe id
+        elif 'l17_619' in filename:
+            print('l17_619')
+            SPLIT_PLACE = {0:(0,5042),
+                           1:(5043,len(self.df))} # 最后一行的dataframe id
+
+
         # Write ARFF file
         with open(output_path, 'w') as f:
             # Write header
@@ -208,28 +226,40 @@ class DataProcessor:
             
             # Create sliding windows
             features_data = self.df[features].values
-            num_samples = len(self.df) - seq_length
+            # num_samples = len(self.df) - seq_length
+            num_samples = len(self.df)
+            for _,(start,end) in SPLIT_PLACE.items():
+                print(start,end)
+                _count = 0
+                for i in range(start+seq_length,end+1,step_len):
+                    _count += 1
+                    window = features_data[i-seq_length:i]
+                    # Create feature sequences for each feature type
+                    feature_sequences = []
+                    for j in range(len(features)):
+                        sequence = ",".join(str(val) for val in window[:, j])
+                        feature_sequences.append(sequence)
+
+                    target = self.df['af'].iloc[i-1]
+                    # Join sequences with ":" and add label
+                    row_str = ":".join(feature_sequences) + ":" + str(float(target))
+                    f.write(f"{row_str}\n")
+                print('这一段计数',_count)
             
-            for i in range(start_point+seq_length,num_samples,step_len):
-                # window = features_data[i:i+seq_length]
-                window = features_data[i-seq_length:i]
-                # Create feature sequences for each feature type
-                feature_sequences = []
-                for j in range(len(features)):
-                    sequence = ",".join(str(val) for val in window[:, j])
-                    feature_sequences.append(sequence)
-                
-                # Add target label
-                # target = self.df['af'].iloc[i+seq_length-1]
-                # print(window[-1])
-                # print(self.df[['posi_type', 'dv','altitude','roll']].iloc[i-1])
-                # print(window[-1][-1] - self.df['roll'].iloc[i-1],\
-                #       window[-1][-2] - self.df['altitude'].iloc[i-1])
-                # input()
-                target = self.df['af'].iloc[i-1]
-                # Join sequences with ":" and add label
-                row_str = ":".join(feature_sequences) + ":" + str(float(target))
-                f.write(f"{row_str}\n")
+            # for i in range(start_point+seq_length,num_samples,step_len):
+            #     # window = features_data[i:i+seq_length]
+            #     window = features_data[i-seq_length:i]
+            #     # Create feature sequences for each feature type
+            #     feature_sequences = []
+            #     for j in range(len(features)):
+            #         sequence = ",".join(str(val) for val in window[:, j])
+            #         feature_sequences.append(sequence)
+
+            #     target = self.df['af'].iloc[i-1]
+            #     # Join sequences with ":" and add label
+            #     row_str = ":".join(feature_sequences) + ":" + str(float(target))
+            #     f.write(f"{row_str}\n")
+            
             # output_path
             parent_dir = os.path.dirname(output_path)
             file = os.path.basename(output_path)
@@ -250,18 +280,39 @@ class DataProcessor:
             return target_file
     def csv_to_csv_switch(self, seq_length=50, step_length=4,start_point=0):
         """Downsample the CSV data by selecting rows at regular intervals."""
+        a,_ = os.path.split(self.file_path)
+        _,filename = os.path.split(a)
+        if 'l35_809' in filename:
+            print('l35_809')
+            SPLIT_PLACE = {0:(0,13951),\
+                           1:(13952,26049),\
+                           2:(26050,len(self.df))} # 最后一行的dataframe id
+        elif 'l35_727' in filename:
+            print('l35_727')
+            SPLIT_PLACE = {0:(0,26800),\
+                           1:(26801,58420),\
+                           2:(58421,len(self.df))} # 最后一行的dataframe id
+        elif 'l17_619' in filename:
+            print('l17_619')
+            SPLIT_PLACE = {0:(0,5042),
+                           1:(5043,len(self.df))} # 最后一行的dataframe id
+
+        
         num_samples = len(self.df) - seq_length
         step_len = int(seq_length // step_length)
         output_path = self.file_path.replace(".csv", f"_{step_len}_stage3.csv")
         print(output_path)
         
         # features = ['id','posi_type','numsv', 'dv', 'fovd', 'speed','altitude','roll']
-        features = ['id','posi_type','numsv', 'dv', 'fovd', 'speed','altitude','roll',\
+        features = ['id','posi_type','numsv', 'dv', 'fovd', 'speed','altitude','roll','af',\
                     f'FOV_distance2',f'FOV_distance3',f'FOV_distance4',f'FOV_distance5']
-        
+
         # Select rows at regular intervals using step_len
-        downsampled_df = self.df.iloc[start_point+seq_length-1:num_samples:step_len]
-        
+        downsampled_df = pd.DataFrame()
+        for _, (start, end) in SPLIT_PLACE.items():
+            segment_df = self.df.iloc[start+seq_length-1:end:step_len]
+            downsampled_df = pd.concat([downsampled_df, segment_df])
+            print(segment_df.shape[0])
         # Save the downsampled data to CSV
         columns_to_save = features + ['af']
         downsampled_df[columns_to_save].to_csv(output_path, index=False)

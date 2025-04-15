@@ -2,8 +2,8 @@ paths:
   test: /home/gyx/projects/shapeformer/Dataset/raw/serinf2jag/modisf/20250304_2125_l35_809/train_converted_data_5D_full.csv
   train: /home/gyx/projects/shapeformer/Dataset/raw/serinf2jag/modisf/20250304_1052_l35_727/train_converted_data_5D_full.csv
 
-sample_sequence_length: 200
-step_length: 8
+sample_sequence_length: 100
+step_length: 1
 start_point: 10
 target_d_precision: 1.2
-test_case_name: /home/gyx/projects/shapeformer/Dataset/CQC/Multivariate_ts/RealMFQC_StageIII_id21
+test_case_name: /home/gyx/projects/shapeformer/Dataset/CQC/Multivariate_ts/RealMFQC_StageIII_id32_sample
